@@ -24,7 +24,7 @@ public class StandaloneDataframeApp {
   private void start() {
     SparkSession spark = SparkSession.builder()
         .appName("Standalone dataframe")
-        //.master("spark://172.31.35.171:7077")
+        // .master("spark://172.31.35.171:7077")
         .getOrCreate();
 
     String[] l = new String[] { "a", "b", "c", "d" };

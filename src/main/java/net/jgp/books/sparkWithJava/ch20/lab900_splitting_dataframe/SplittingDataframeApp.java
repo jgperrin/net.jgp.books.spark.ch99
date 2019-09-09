@@ -42,7 +42,7 @@ public class SplittingDataframeApp {
     Dataset<Row> df = createRandomDataframe(spark);
     df = df.cache();
     df.show();
-    
+
     long count = df.count();
     long inc = count / 10;
     for (long i = 0; i < count; i += inc) {
