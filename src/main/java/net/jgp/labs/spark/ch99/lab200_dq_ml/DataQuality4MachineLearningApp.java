@@ -49,9 +49,12 @@ public class DataQuality4MachineLearningApp {
         new PriceCorrelationDataQualityUdf(), DataTypes.DoubleType);
 
     // Load our dataset
-    String filename = "data/dataset-abstract.csv";
-    Dataset<Row> df = spark.read().format("csv")
-        .option("inferSchema", "true").option("header", "false")
+    String filename = "data/restaurant/checks.csv";
+    Dataset<Row> df = spark
+        .read()
+        .format("csv")
+        .option("inferSchema", true)
+        .option("header", false)
         .load(filename);
 
     // simple renaming of the columns

@@ -6,8 +6,14 @@ Welcome to Spark in Action, 2nd edition, chapter 99. This chapter is about all t
 
 ## Labs
 
-### Lab #100
+### Lab #200
 This lab mixes machine learning and data quality to predict the revenues of a party of 40 people at a restaurant.
+
+### Lab #9xx
+Bunch of stuff in progress.
+
+## Data
+Lots of datasets in this repo, which will be cleaned soon!
 
 Notes: 
  1. Due to renaming the packages to match more closely Java standards, this project is not in sync with the book's MEAP prior to v10 (published in April 2019).

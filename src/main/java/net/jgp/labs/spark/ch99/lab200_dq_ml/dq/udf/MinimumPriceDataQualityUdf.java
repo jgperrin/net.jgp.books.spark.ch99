@@ -6,9 +6,9 @@ import net.jgp.labs.spark.ch99.lab200_dq_ml.dq.service.MinimumPriceDataQualitySe
 
 public class MinimumPriceDataQualityUdf implements UDF1<Double, Double> {
 
-	private static final long serialVersionUID = -201966159201746851L;
+  private static final long serialVersionUID = -201966159201746851L;
 
-	public Double call(Double t1) throws Exception {
-		return MinimumPriceDataQualityService.checkMinimumPrice(t1);
-	}
+  public Double call(Double t1) throws Exception {
+    return MinimumPriceDataQualityService.checkMinimumPrice(t1);
+  }
 }
