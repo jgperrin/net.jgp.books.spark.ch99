@@ -1,4 +1,4 @@
-package net.jgp.books.sparkWithJava.ch18.lab100.linearRegression;
+package net.jgp.books.spark.ch99.lab930_interesting_stuff;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -9,7 +9,7 @@ import org.apache.spark.sql.SparkSession;
  * 
  * @author jgp
  */
-public class FirstLinearRegressionApp {
+public class MyApp {
 
   /**
    * main() is your entry point to the application.
@@ -17,7 +17,7 @@ public class FirstLinearRegressionApp {
    * @param args
    */
   public static void main(String[] args) {
-    FirstLinearRegressionApp app = new FirstLinearRegressionApp();
+    MyApp app = new MyApp();
     app.start();
   }
 
