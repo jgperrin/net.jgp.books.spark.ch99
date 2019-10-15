@@ -11,5 +11,4 @@ public abstract class MinimumPriceDataQualityService {
       return price;
     }
   }
-
 }
