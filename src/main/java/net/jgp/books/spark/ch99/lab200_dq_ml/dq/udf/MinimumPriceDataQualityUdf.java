@@ -1,8 +1,8 @@
-package net.jgp.labs.spark.ch99.lab200_dq_ml.dq.udf;
+package net.jgp.books.spark.ch99.lab200_dq_ml.dq.udf;
 
 import org.apache.spark.sql.api.java.UDF1;
 
-import net.jgp.labs.spark.ch99.lab200_dq_ml.dq.service.MinimumPriceDataQualityService;
+import net.jgp.books.spark.ch99.lab200_dq_ml.dq.service.MinimumPriceDataQualityService;
 
 public class MinimumPriceDataQualityUdf implements UDF1<Double, Double> {
 

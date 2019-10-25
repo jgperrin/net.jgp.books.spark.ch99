@@ -1,4 +1,4 @@
-package net.jgp.labs.spark.ch99.lab200_dq_ml.dq.service;
+package net.jgp.books.spark.ch99.lab200_dq_ml.dq.service;
 
 public abstract class MinimumPriceDataQualityService {
 

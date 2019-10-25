@@ -1,4 +1,4 @@
-package net.jgp.labs.spark.ch99.lab200_dq_ml;
+package net.jgp.books.spark.ch99.lab200_dq_ml;
 
 import static org.apache.spark.sql.functions.callUDF;
 
@@ -13,8 +13,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 
-import net.jgp.labs.spark.ch99.lab200_dq_ml.dq.udf.MinimumPriceDataQualityUdf;
-import net.jgp.labs.spark.ch99.lab200_dq_ml.dq.udf.PriceCorrelationDataQualityUdf;
+import net.jgp.books.spark.ch99.lab200_dq_ml.dq.udf.MinimumPriceDataQualityUdf;
+import net.jgp.books.spark.ch99.lab200_dq_ml.dq.udf.PriceCorrelationDataQualityUdf;
 
 /**
  * Cleans a dataset and then extrapolates date through machine learning, via
