@@ -4,20 +4,29 @@ The examples in this repository are support to the **[Spark in Action, 2nd editi
 
 Welcome to Spark in Action, 2nd edition, chapter 99. This chapter is about all the stuff that we'd love to have in the book, but we could not because it is already more than 600 pages.
 
-## Labs
+## Data quality labs
+
+Located in the dq sub package.
 
 ### Lab #200
 This lab mixes machine learning and data quality to predict the revenues of a party of 40 people at a restaurant.
 
+## Covid19 labs
+
+Located in the covid19 package.
+
+## Other stuff
+
+Located in the misc package.
+
 ### Lab #9xx
-Bunch of stuff in progress.
+Bunch of stuff in progress, please ignore.
 
 ## Data
 Lots of datasets in this repo, which will be cleaned soon!
 
 Notes: 
- 1. Due to renaming the packages to match more closely Java standards, this project is not in sync with the book's MEAP prior to v10 (published in April 2019).
- 2. As of MEAP v14, we have introduced Scala and Python examples (published in October 2019).
+ 1. This repository online contains Java examples.
  
 ---
 

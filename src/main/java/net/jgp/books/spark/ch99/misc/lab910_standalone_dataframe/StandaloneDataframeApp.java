@@ -1,4 +1,4 @@
-package net.jgp.books.spark.ch99.lab910_standalone_dataframe;
+package net.jgp.books.spark.ch99.misc.lab910_standalone_dataframe;
 
 import java.util.Arrays;
 import java.util.List;

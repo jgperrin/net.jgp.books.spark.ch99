@@ -1,4 +1,4 @@
-package net.jgp.books.spark.ch99.lab920_splitting_dataframe;
+package net.jgp.books.spark.ch99.misc.lab920_splitting_dataframe;
 
 import java.util.ArrayList;
 import java.util.List;

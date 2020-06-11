@@ -1,4 +1,4 @@
-package net.jgp.books.spark.ch99.lab200_dq_ml;
+package net.jgp.books.spark.ch99.covid19.lab100_ingestion;
 
 import static org.apache.spark.sql.functions.callUDF;
 
@@ -13,8 +13,8 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.DataTypes;
 
-import net.jgp.books.spark.ch99.lab200_dq_ml.dq.udf.MinimumPriceDataQualityUdf;
-import net.jgp.books.spark.ch99.lab200_dq_ml.dq.udf.PriceCorrelationDataQualityUdf;
+import net.jgp.books.spark.ch99.dq.lab200_dq_ml.dq.udf.MinimumPriceDataQualityUdf;
+import net.jgp.books.spark.ch99.dq.lab200_dq_ml.dq.udf.PriceCorrelationDataQualityUdf;
 
 /**
  * Cleans a dataset and then extrapolates date through machine learning, via
@@ -23,11 +23,11 @@ import net.jgp.books.spark.ch99.lab200_dq_ml.dq.udf.PriceCorrelationDataQualityU
  * @author jgp
  *
  */
-public class DataQuality4MachineLearningApp {
+public class SimpleDataIngestionApp {
 
   public static void main(String[] args) {
-    DataQuality4MachineLearningApp app =
-        new DataQuality4MachineLearningApp();
+    SimpleDataIngestionApp app =
+        new SimpleDataIngestionApp();
     app.start();
   }
 
