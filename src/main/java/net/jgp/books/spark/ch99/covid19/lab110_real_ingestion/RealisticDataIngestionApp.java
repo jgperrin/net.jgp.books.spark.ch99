@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import static org.apache.spark.sql.functions.*;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
@@ -102,7 +103,18 @@ public class RealisticDataIngestionApp {
     Dataset<Row> df = null;
     switch (header) {
       case "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered":
+        log.debug("Using ingest 1 for [{}]", path);
         df = ingest1(path);
+        break;
+
+      case "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incidence_Rate,Case-Fatality_Ratio":
+        log.debug("Using ingest 2 for [{}]", path);
+        df = ingest2(path);
+        break;
+
+      case "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key":
+        log.debug("Using ingest 3 for [{}]", path);
+        df = ingest3(path);
         break;
 
       default:
@@ -112,11 +124,25 @@ public class RealisticDataIngestionApp {
     return df;
   }
 
-  private Dataset<Row> ingest1(String path) {
+  /**
+   * FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key
+   * 
+   * @param path
+   * @return
+   */
+  private Dataset<Row> ingest3(String path) {
     // Creates the schema
     StructType schema = DataTypes.createStructType(new StructField[] {
         DataTypes.createStructField(
-            "province",
+            "fips",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "admin",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "state",
             DataTypes.StringType,
             false),
         DataTypes.createStructField(
@@ -124,7 +150,143 @@ public class RealisticDataIngestionApp {
             DataTypes.StringType,
             false),
         DataTypes.createStructField(
-            "lastupdate",
+            "lastUpdate",
+            DataTypes.TimestampType,
+            false),
+        DataTypes.createStructField(
+            "latitude",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "longitude",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "confirmed",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "deaths",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "recovered",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "active",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "combinedKey",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "incidenceRate",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "caseFatalityRatio",
+            DataTypes.DoubleType,
+            false) });
+
+    Dataset<Row> df = spark
+        .read()
+        .format("csv")
+        .schema(schema)
+        .option("header", true)
+        .load(path);
+    return df;
+  }
+
+  /**
+   * FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incidence_Rate,Case-Fatality_Ratio
+   * 
+   * @param path
+   * @return
+   */
+  private Dataset<Row> ingest2(String path) {
+    // Creates the schema
+    StructType schema = DataTypes.createStructType(new StructField[] {
+        DataTypes.createStructField(
+            "fips",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "admin",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "state",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "country",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "lastUpdate",
+            DataTypes.TimestampType,
+            false),
+        DataTypes.createStructField(
+            "latitude",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "longitude",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "confirmed",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "deaths",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "recovered",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "active",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "combinedKey",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "incidenceRate",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "caseFatalityRatio",
+            DataTypes.DoubleType,
+            false) });
+
+    Dataset<Row> df = spark
+        .read()
+        .format("csv")
+        .schema(schema)
+        .option("header", true)
+        .load(path);
+    return df;
+  }
+
+  private Dataset<Row> ingest1(String path) {
+    // Creates the schema
+    StructType schema = DataTypes.createStructType(new StructField[] {
+        DataTypes.createStructField(
+            "state",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "country",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "lastUpdate",
             DataTypes.TimestampType,
             false),
         DataTypes.createStructField(
@@ -138,6 +300,22 @@ public class RealisticDataIngestionApp {
         DataTypes.createStructField(
             "recovered",
             DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "active",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "combinedKey",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "incidenceRate",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "caseFatalityRatio",
+            DataTypes.DoubleType,
             false) });
 
     Dataset<Row> df = spark
@@ -146,6 +324,12 @@ public class RealisticDataIngestionApp {
         .schema(schema)
         .option("header", true)
         .load(path);
+
+    df = df
+        .withColumn("fips", lit(null))
+        .withColumn("admin", lit(null))
+        .withColumn("latitude", lit(null))
+        .withColumn("longitude", lit(null));
     return df;
   }
 }

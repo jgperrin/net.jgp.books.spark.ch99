@@ -15,6 +15,9 @@ This lab mixes machine learning and data quality to predict the revenues of a pa
 
 Located in the covid19 package.
 
+### Data
+The data being ingested for those labs is coming from the Center for Systems Science and Engineering (CSSE), part of the Whiting School of Engineering of Johns Hopkins University (JHU). The data is share on GitHub at https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data.
+
 ## Other stuff
 
 Located in the misc package.
