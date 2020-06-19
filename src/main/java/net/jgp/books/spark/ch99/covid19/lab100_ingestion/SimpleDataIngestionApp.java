@@ -1,17 +1,8 @@
 package net.jgp.books.spark.ch99.covid19.lab100_ingestion;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
-import org.apache.spark.sql.types.StructField;
-import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +41,6 @@ public class SimpleDataIngestionApp {
         .appName("Ingestion of Covid-19 data")
         .master("local[*]")
         .getOrCreate();
-
 
     log.debug("##### Ingestion");
     String filenames =
