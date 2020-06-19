@@ -75,8 +75,17 @@ public class RealisticDataIngestionApp {
       String header = null;
       try {
         header = Files.lines(p).findFirst().get();
+        log.trace(
+            "###   First and last header character are [{}]..[{}]",
+            (int) header.charAt(0),
+            header.charAt(header.length() - 1));
       } catch (IOException e) {
-        // handle exception.
+        log.error("Error whilte reading {}, got {}.", p, e.getMessage());
+      }
+      
+      // Remove Unicode Character 'ZERO WIDTH NO-BREAK SPACE' (U+FEFF)
+      if (header.charAt(0) == 65279) {
+        header = header.substring(1);
       }
       Dataset<Row> intermediateDf = ingest(p.toString(), header);
       if (intermediateDf != null) {
@@ -91,6 +100,8 @@ public class RealisticDataIngestionApp {
     log.debug("##### Ingestion");
     String filenames =
         "data/covid19-jhu/csse_covid_19_data/csse_covid_19_daily_reports/01*.csv";
+    
+    df = df.filter(df.col("country").equalTo("US"));
 
     // Stat
     log.debug("##### Stat");
@@ -99,11 +110,11 @@ public class RealisticDataIngestionApp {
   }
 
   private Dataset<Row> ingest(String path, String header) {
-    // TODO Auto-generated method stub
     Dataset<Row> df = null;
     switch (header) {
       case "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered":
-        log.debug("Using ingest 1 for [{}]", path);
+        log.debug("Using ingest 1 for [{}], header length is [{}]", path,
+            header.length());
         df = ingest1(path);
         break;
 
@@ -117,10 +128,92 @@ public class RealisticDataIngestionApp {
         df = ingest3(path);
         break;
 
+      case "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered,Latitude,Longitude":
+        log.debug("Using ingest 4 for [{}]", path);
+        df = ingest4(path);
+        break;
+
       default:
-        log.error("Unknown ingester for {}", header);
+        log.error("Unknown ingester for [{}], header length is [{}]",
+            header, header.length());
         break;
     }
+    return df;
+  }
+
+  /**
+   * Province/State,Country/Region,Last
+   * Update,Confirmed,Deaths,Recovered,Latitude,Longitude
+   * 
+   * @param path
+   * @return
+   */
+  private Dataset<Row> ingest4(String path) {
+    // Creates the schema
+    StructType schema = DataTypes.createStructType(new StructField[] {
+        DataTypes.createStructField(
+            "state",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "country",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "lastUpdate",
+            DataTypes.TimestampType,
+            false),
+        DataTypes.createStructField(
+            "confirmed",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "deaths",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "recovered",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "latitude",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "longitude",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "active",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "combinedKey",
+            DataTypes.StringType,
+            false),
+        DataTypes.createStructField(
+            "incidenceRate",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "caseFatalityRatio",
+            DataTypes.DoubleType,
+            false),
+        DataTypes.createStructField(
+            "fips",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "admin",
+            DataTypes.StringType,
+            false) });
+
+    Dataset<Row> df = spark
+        .read()
+        .format("csv")
+        .schema(schema)
+        .option("header", true)
+        .load(path);
     return df;
   }
 
