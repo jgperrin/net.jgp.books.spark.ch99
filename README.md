@@ -4,6 +4,8 @@ The examples in this repository are support to the **[Spark in Action, 2nd editi
 
 Welcome to Spark in Action, 2nd edition, chapter 99. This chapter is about all the stuff that we'd love to have in the book, but we could not because it is already more than 600 pages.
 
+Those examples are only using Java and are based on Spark v2.4.4.
+
 ## Data quality labs
 
 Located in the dq sub package.
@@ -29,7 +31,7 @@ Bunch of stuff in progress, please ignore.
 Lots of datasets in this repo, which will be cleaned soon!
 
 Notes: 
- 1. This repository online contains Java examples.
+ 1. This repository only contains Java examples.
  
 ---
 
