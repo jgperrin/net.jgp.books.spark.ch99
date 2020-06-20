@@ -96,12 +96,8 @@ public class RealisticDataIngestionApp {
         }
       }
     }
-
-    log.debug("##### Ingestion");
-    String filenames =
-        "data/covid19-jhu/csse_covid_19_data/csse_covid_19_daily_reports/01*.csv";
     
-    df = df.filter(df.col("country").equalTo("US"));
+    //df = df.filter(df.col("country").equalTo("US"));
 
     // Stat
     log.debug("##### Stat");

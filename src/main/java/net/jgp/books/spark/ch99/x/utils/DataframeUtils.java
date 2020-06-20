@@ -6,7 +6,7 @@ import org.apache.spark.sql.Row;
 public abstract class DataframeUtils {
 
   public static void show(Dataset<Row> df) {
-    df.show(100, false);
+    df.sample(0.99).show(100, false);
     df.printSchema();
     System.out.println(df.count() + " records.");
   }
