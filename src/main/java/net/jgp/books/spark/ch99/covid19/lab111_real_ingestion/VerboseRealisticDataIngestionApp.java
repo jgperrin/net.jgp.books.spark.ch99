@@ -1,10 +1,13 @@
-package net.jgp.books.spark.ch99.covid19.lab110_real_ingestion;
+package net.jgp.books.spark.ch99.covid19.lab111_real_ingestion;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -23,16 +26,19 @@ import net.jgp.books.spark.ch99.x.utils.DataframeUtils;
  * Cleans a dataset and then extrapolates date through machine learning, via
  * a linear regression using Apache Spark.
  * 
+ * This version is the same as lab #110, with additional verbosity and
+ * comments.
+ * 
  * @author jgp
  *
  */
-public class RealisticDataIngestionApp {
+public class VerboseRealisticDataIngestionApp {
   private static Logger log =
-      LoggerFactory.getLogger(RealisticDataIngestionApp.class);
+      LoggerFactory.getLogger(VerboseRealisticDataIngestionApp.class);
 
   public static void main(String[] args) {
-    RealisticDataIngestionApp app =
-        new RealisticDataIngestionApp();
+    VerboseRealisticDataIngestionApp app =
+        new VerboseRealisticDataIngestionApp();
     app.start();
   }
 
@@ -58,17 +64,23 @@ public class RealisticDataIngestionApp {
         .getOrCreate();
 
     log.debug("##### List all files");
-    DirectoryStream<Path> files;
+    DirectoryStream<Path> directory;
     try {
-      files = Files.newDirectoryStream(
+      directory = Files.newDirectoryStream(
           Paths.get(dataDirectory),
-          path -> path.toString().endsWith(".csv"));
+          path -> path.toString().toLowerCase().endsWith(".csv"));
     } catch (IOException e) {
       log.error(
           "Could not list files from directory {}, got {}.",
           dataDirectory, e.getMessage());
       return false;
     }
+
+    // Sorting is only used for debugging, it does not affect outcome.
+    log.debug("##### Sort files");
+    List<Path> files = new ArrayList<>();
+    directory.forEach(files::add);
+    files.sort(Comparator.comparing(Path::toString));
 
     Dataset<Row> df = null;
     for (Path p : files) {
@@ -83,13 +95,19 @@ public class RealisticDataIngestionApp {
       } catch (IOException e) {
         log.error("Error whilte reading {}, got {}.", p, e.getMessage());
       }
-      
+
       // Remove Unicode Character 'ZERO WIDTH NO-BREAK SPACE' (U+FEFF)
       if (header.charAt(0) == 65279) {
+        log.debug("{} starts with a ZERO WIDTH NO-BREAK SPACE",
+            p.getFileName());
         header = header.substring(1);
       }
       Dataset<Row> intermediateDf = ingest(p.toString(), header);
       if (intermediateDf != null) {
+        if (log.isDebugEnabled()) {
+          log.debug("{} contains {} records", p.getFileName(),
+              intermediateDf.count());
+        }
         if (df == null) {
           df = intermediateDf;
         } else {
@@ -97,8 +115,8 @@ public class RealisticDataIngestionApp {
         }
       }
     }
-    
-    //df = df.filter(df.col("country").equalTo("US"));
+
+    // df = df.filter(df.col("country").equalTo("US"));
 
     // Stat
     log.debug("##### Stat");
