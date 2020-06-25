@@ -1,4 +1,5 @@
-package net.jgp.books.spark.ch99.covid19.lab110_real_ingestion;
+
+package net.jgp.books.spark.ch99.covid19.lab200_early_transformation;
 
 import static org.apache.spark.sql.functions.lit;
 
@@ -27,13 +28,13 @@ import net.jgp.books.spark.ch99.x.utils.DataframeUtils;
  * @author jgp
  *
  */
-public class RealisticDataIngestionApp {
+public class EarlyTransformationApp {
   private static Logger log =
-      LoggerFactory.getLogger(RealisticDataIngestionApp.class);
+      LoggerFactory.getLogger(EarlyTransformationApp.class);
 
   public static void main(String[] args) {
-    RealisticDataIngestionApp app =
-        new RealisticDataIngestionApp();
+    EarlyTransformationApp app =
+        new EarlyTransformationApp();
     app.start();
   }
 
@@ -44,6 +45,19 @@ public class RealisticDataIngestionApp {
    */
   private boolean start() {
     log.debug("-> start()");
+
+    Dataset<Row> df = ingestCovid19();
+
+    // df = df.filter(df.col("country").equalTo("US"));
+
+    // Stat
+    log.debug("##### Stat");
+    DataframeUtils.show(df);
+    return true;
+  }
+
+  private Dataset<Row> ingestCovid19() {
+
     String dataDirectory =
         "data/covid19-jhu/csse_covid_19_data/csse_covid_19_daily_reports";
 
@@ -68,7 +82,7 @@ public class RealisticDataIngestionApp {
       log.error(
           "Could not list files from directory {}, got {}.",
           dataDirectory, e.getMessage());
-      return false;
+      return null;
     }
 
     Dataset<Row> df = null;
@@ -99,12 +113,7 @@ public class RealisticDataIngestionApp {
       }
     }
 
-    // df = df.filter(df.col("country").equalTo("US"));
-
-    // Stat
-    log.debug("##### Stat");
-    DataframeUtils.show(df);
-    return true;
+    return df;
   }
 
   private Dataset<Row> ingest(String path, String header) {

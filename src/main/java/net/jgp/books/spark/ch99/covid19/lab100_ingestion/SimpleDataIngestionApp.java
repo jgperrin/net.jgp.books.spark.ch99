@@ -51,7 +51,7 @@ public class SimpleDataIngestionApp {
         .option("inferSchema", true)
         .option("header", true)
         .load(filenames);
-    
+
     // Stat
     log.debug("##### Stat");
     DataframeUtils.show(df);

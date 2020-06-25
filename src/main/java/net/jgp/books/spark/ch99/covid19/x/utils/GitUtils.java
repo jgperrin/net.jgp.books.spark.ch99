@@ -55,7 +55,8 @@ public abstract class GitUtils {
             .setDirectory(dest)
             .call();
       } catch (GitAPIException e) {
-        log.error("Exception while creating a local Git repo at {}, got {}.",
+        log.error(
+            "Exception while creating a local Git repo at {}, got {}.",
             repositoryUrl, e.getMessage());
         return false;
       }
