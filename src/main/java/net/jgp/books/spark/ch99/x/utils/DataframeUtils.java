@@ -14,10 +14,15 @@ public abstract class DataframeUtils {
   }
 
   public static void analyzeColumn(Dataset<Row> df, String col) {
-    Dataset<Row> workDf = df.groupBy(col).agg(count(col).as(K.COUNT)).orderBy(col(K.COUNT).desc());
-    workDf.show();
-    workDf.orderBy(col(K.COUNT).asc()).show(5);
+    System.out.println("Analyzing " + col);
+    Dataset<Row> workDf = df
+        .groupBy(col)
+        .agg(count(col).as(K.COUNT))
+        .orderBy(col(K.COUNT).desc());
+    workDf.show(20, false);
+    workDf.orderBy(col(K.COUNT).asc()).show(5, false);
     workDf.printSchema();
+    System.out.println(workDf.count() + " record(s).");
   }
 
 }

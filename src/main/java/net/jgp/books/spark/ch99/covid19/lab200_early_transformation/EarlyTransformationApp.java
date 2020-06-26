@@ -47,19 +47,33 @@ public class EarlyTransformationApp {
       return false;
     }
 
-    df = df
-        .repartition(1)
-        .filter(df.col("combinedKey").isNotNull())
-    ;
-
     // Transformations
     df = df
-        .withColumn("country", when(df.col("country").contains("China"), lit("China")).otherwise(df.col("country")))
+        .repartition(1)
+        //.filter(df.col("country").contains("Korea"))
+        .withColumn("country",
+            when(
+                df.col("country").equalTo("Republic of Korea").or(df.col("country").equalTo("Korea, South")),
+                lit("South Korea"))
+                    .otherwise(df.col("country")));
+    df = df
+        .withColumn("country",
+            when(
+                df.col("country").contains("China"),
+                lit("China"))
+                    .otherwise(df.col("country")));
+    df = df
+        .withColumn("combinedKey",
+            when(
+                df.col("combinedKey").isNull(),
+                concat_ws(", ", df.col("state"), df.col("country")))
+                    .otherwise(df.col("combinedKey")))
         .withColumn("date", to_date(df.col("lastUpdate")));
-
+    
     // Stat
     log.debug("##### Stat");
     DataframeUtils.show(df);
+    DataframeUtils.analyzeColumn(df, "state");
     DataframeUtils.analyzeColumn(df, "country");
     return true;
   }
