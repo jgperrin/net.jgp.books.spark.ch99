@@ -1,7 +1,5 @@
 
-package net.jgp.books.spark.ch99.covid19.lab200_early_transformation;
-
-import static org.apache.spark.sql.functions.*;
+package net.jgp.books.spark.ch99.covid19.lab300_day1_builder;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -18,12 +16,12 @@ import net.jgp.books.spark.ch99.x.utils.DataframeUtils;
  * @author jgp
  *
  */
-public class EarlyTransformationApp {
+public class BuildDayOneDatasetApp {
   private static Logger log =
-      LoggerFactory.getLogger(EarlyTransformationApp.class);
+      LoggerFactory.getLogger(BuildDayOneDatasetApp.class);
 
   public static void main(String[] args) {
-    EarlyTransformationApp app = new EarlyTransformationApp();
+    BuildDayOneDatasetApp app = new BuildDayOneDatasetApp();
     app.start();
   }
 
@@ -46,29 +44,9 @@ public class EarlyTransformationApp {
       log.error("Could not ingest data.");
       return false;
     }
-    
+
     // Transformations
-    df = df
-        .repartition(1)
-        //.filter(df.col("country").contains("Korea"))
-        .withColumn("country",
-            when(
-                df.col("country").equalTo("Republic of Korea").or(df.col("country").equalTo("Korea, South")),
-                lit("South Korea"))
-                    .otherwise(df.col("country")));
-    df = df
-        .withColumn("country",
-            when(
-                df.col("country").contains("China"),
-                lit("China"))
-                    .otherwise(df.col("country")));
-    df = df
-        .withColumn("combinedKey",
-            when(
-                df.col("combinedKey").isNull(),
-                concat_ws(", ", df.col("state"), df.col("country")))
-                    .otherwise(df.col("combinedKey")))
-        .withColumn("date", to_date(df.col("lastUpdate")));
+    df = DataPreparer.applyDataQualityRules(df);
     
     // Stat
     log.debug("##### Stat");
