@@ -1,13 +1,17 @@
 package net.jgp.books.spark.ch99.covid19.lab300_day1_builder;
 
-import static org.apache.spark.sql.functions.lit;
+import static org.apache.spark.sql.functions.*;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -71,7 +75,8 @@ public abstract class CovidIngester {
       if (header.charAt(0) == 65279) {
         header = header.substring(1);
       }
-      Dataset<Row> intermediateDf = mainIngest(p.toString(), header);
+      Dataset<Row> intermediateDf =
+          mainIngest(p.toString(), header, p.getFileName());
       if (intermediateDf != null) {
         if (df == null) {
           df = intermediateDf;
@@ -84,28 +89,38 @@ public abstract class CovidIngester {
     return df;
   }
 
-  private static Dataset<Row> mainIngest(String path, String header) {
+  private static Dataset<Row> mainIngest(
+      String path, String header, Path filename) {
     Dataset<Row> df = null;
     switch (header) {
+
+      // Early January
       case "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered":
         log.trace("Using ingest 1 for [{}], header length is [{}]", path,
             header.length());
-        df = ingest1(path);
+        df = ingester1(path);
+        df = df.withColumn("ingester", lit(1));
         break;
 
-      case "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incidence_Rate,Case-Fatality_Ratio":
+      // February
+      case "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered,Latitude,Longitude":
         log.trace("Using ingest 2 for [{}]", path);
-        df = ingest2(path);
+        df = ingester2(path);
+        df = df.withColumn("ingester", lit(2));
         break;
 
+      // March
       case "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key":
         log.trace("Using ingest 3 for [{}]", path);
-        df = ingest3(path);
+        df = ingester3(path);
+        df = df.withColumn("ingester", lit(3));
         break;
 
-      case "Province/State,Country/Region,Last Update,Confirmed,Deaths,Recovered,Latitude,Longitude":
+      // April and later
+      case "FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incidence_Rate,Case-Fatality_Ratio":
         log.trace("Using ingest 4 for [{}]", path);
-        df = ingest4(path);
+        df = ingester4(path);
+        df = df.withColumn("ingester", lit(4));
         break;
 
       default:
@@ -113,7 +128,18 @@ public abstract class CovidIngester {
             header, header.length());
         break;
     }
+    df = df.withColumn("reportedDate",
+        to_date(lit(filename.toString().substring(0, 10)), "MM-dd-yyyy"));
     return df;
+  }
+
+  private static Date filenameToDate(String filename) {
+    try {
+      return new SimpleDateFormat("MM-dd-yyyy")
+          .parse(filename.substring(0, 9));
+    } catch (ParseException e) {
+      return null;
+    }
   }
 
   /**
@@ -123,7 +149,7 @@ public abstract class CovidIngester {
    * @param path
    * @return
    */
-  private static Dataset<Row> ingest4(String path) {
+  private static Dataset<Row> ingester2(String path) {
     // Creates the schema
     StructType schema = DataTypes.createStructType(new StructField[] {
         DataTypes.createStructField(
@@ -198,7 +224,7 @@ public abstract class CovidIngester {
    * @param path
    * @return
    */
-  private static Dataset<Row> ingest3(String path) {
+  private static Dataset<Row> ingester3(String path) {
     // Creates the schema
     StructType schema = DataTypes.createStructType(new StructField[] {
         DataTypes.createStructField(
@@ -263,6 +289,7 @@ public abstract class CovidIngester {
         .format("csv")
         .schema(schema)
         .option("header", true)
+        .option("timestampFormat", "M/d/y H:m")
         .load(path);
     return df;
   }
@@ -273,7 +300,7 @@ public abstract class CovidIngester {
    * @param path
    * @return
    */
-  private static Dataset<Row> ingest2(String path) {
+  private static Dataset<Row> ingester4(String path) {
     // Creates the schema
     StructType schema = DataTypes.createStructType(new StructField[] {
         DataTypes.createStructField(
@@ -342,7 +369,7 @@ public abstract class CovidIngester {
     return df;
   }
 
-  private static Dataset<Row> ingest1(String path) {
+  private static Dataset<Row> ingester1(String path) {
     // Creates the schema
     StructType schema = DataTypes.createStructType(new StructField[] {
         DataTypes.createStructField(
@@ -391,6 +418,7 @@ public abstract class CovidIngester {
         .format("csv")
         .schema(schema)
         .option("header", true)
+        .option("timestampFormat", "M/d/y H:m")
         .load(path);
 
     df = df
