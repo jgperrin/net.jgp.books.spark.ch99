@@ -8,7 +8,7 @@ import static org.apache.spark.sql.functions.when;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 
-public abstract class DataPreparer {
+public abstract class DataPurifier {
 
   public static Dataset<Row> applyDataQualityRules(Dataset<Row> df) {
     df = df
