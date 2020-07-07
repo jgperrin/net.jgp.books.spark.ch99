@@ -13,6 +13,12 @@ import static org.apache.spark.sql.functions.when;
 
 import java.util.Date;
 
+import org.apache.spark.ml.evaluation.RegressionEvaluator;
+import org.apache.spark.ml.feature.VectorAssembler;
+import org.apache.spark.ml.linalg.Vectors;
+import org.apache.spark.ml.regression.GBTRegressionModel;
+import org.apache.spark.ml.regression.GBTRegressor;
+import org.apache.spark.ml.regression.RegressionModel;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.expressions.Window;
@@ -59,6 +65,52 @@ public class DataAnalytics {
             .$minus(when((lag("confirmed", 1).over(win)).isNull(), 0)
                 .otherwise(lag("confirmed", 1).over(win))));
     return aggregateDf;
+  }
+
+  public static GBTRegressionModel buildModel(Dataset<Row> trainingDf) {
+    String[] inputCols = new String[1];
+    inputCols[0] = "day";
+    VectorAssembler assembler = new VectorAssembler()
+        .setInputCols(inputCols)
+        .setOutputCol("features");
+    trainingDf = assembler.transform(trainingDf);
+    trainingDf.show(200, false);
+
+    // Start a GBTRegressor
+    GBTRegressor gbt = new GBTRegressor()
+        .setLabelCol("new")
+        .setFeaturesCol("features")
+        .setMaxIter(100)
+        .setLossType("absolute")
+        .setFeatureSubsetStrategy("all");
+
+    // Train model
+    GBTRegressionModel model = gbt.fit(trainingDf);
+
+    // Measures quality index for training data
+    Dataset<Row> italyPredictionsDf = model.transform(trainingDf);
+    RegressionEvaluator evaluator = new RegressionEvaluator()
+        .setLabelCol("new")
+        .setPredictionCol("prediction")
+        .setMetricName("rmse");
+    double rmse = evaluator.evaluate(italyPredictionsDf);
+    log.info("Root Mean Squared Error (RMSE) for Italy: {}", rmse);
+
+    Double d = 200.0;
+    double p = model.predict(Vectors.dense(d));
+    log.info("New cases for day #{}: {}", d, p);
+
+    d = 140.0;
+    p = model.predict(Vectors.dense(d));
+    log.info("New cases for day #{}: {}", d, p);
+
+    return model;
+  }
+
+  public static void predict(GBTRegressionModel model, double feature) {
+    double p = model.predict(Vectors.dense(feature));
+    log.info("New cases for day #{}: {}", feature, p);// ((Double)
+                                                      // p).intValue());
   }
 
 }
