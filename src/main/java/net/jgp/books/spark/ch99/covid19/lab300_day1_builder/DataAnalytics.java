@@ -1,28 +1,34 @@
 package net.jgp.books.spark.ch99.covid19.lab300_day1_builder;
 
+import static java.lang.Math.toIntExact;
 import static org.apache.spark.sql.functions.col;
 import static org.apache.spark.sql.functions.collect_list;
 import static org.apache.spark.sql.functions.date_sub;
 import static org.apache.spark.sql.functions.datediff;
-import static org.apache.spark.sql.functions.filter;
 import static org.apache.spark.sql.functions.first;
 import static org.apache.spark.sql.functions.lag;
 import static org.apache.spark.sql.functions.lit;
 import static org.apache.spark.sql.functions.sum;
 import static org.apache.spark.sql.functions.when;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.spark.ml.evaluation.RegressionEvaluator;
 import org.apache.spark.ml.feature.VectorAssembler;
 import org.apache.spark.ml.linalg.Vectors;
 import org.apache.spark.ml.regression.GBTRegressionModel;
 import org.apache.spark.ml.regression.GBTRegressor;
-import org.apache.spark.ml.regression.RegressionModel;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.RowFactory;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.expressions.Window;
 import org.apache.spark.sql.expressions.WindowSpec;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,50 +73,91 @@ public class DataAnalytics {
     return aggregateDf;
   }
 
-  public static GBTRegressionModel buildModel(Dataset<Row> trainingDf) {
+  public static GBTRegressionModel buildModel(SparkSession spark,
+      Dataset<Row> df) {
+    int maxDay = toIntExact(df.count());
+
+    Dataset<Row> df2 = buildGoalDataframe(spark, maxDay);
+    df = df.unionByName(df2);
     String[] inputCols = new String[1];
     inputCols[0] = "day";
     VectorAssembler assembler = new VectorAssembler()
         .setInputCols(inputCols)
         .setOutputCol("features");
-    trainingDf = assembler.transform(trainingDf);
-    trainingDf.show(200, false);
+    df = assembler.transform(df);
+    df.show(200, false);
 
     // Start a GBTRegressor
     GBTRegressor gbt = new GBTRegressor()
         .setLabelCol("new")
         .setFeaturesCol("features")
-        .setMaxIter(100)
+        .setMaxIter(150)
         .setLossType("absolute")
         .setFeatureSubsetStrategy("all");
 
     // Train model
-    GBTRegressionModel model = gbt.fit(trainingDf);
+    GBTRegressionModel model = gbt.fit(df);
 
     // Measures quality index for training data
-    Dataset<Row> italyPredictionsDf = model.transform(trainingDf);
+    Dataset<Row> predictionsDf = model.transform(df);
     RegressionEvaluator evaluator = new RegressionEvaluator()
         .setLabelCol("new")
         .setPredictionCol("prediction")
         .setMetricName("rmse");
-    double rmse = evaluator.evaluate(italyPredictionsDf);
-    log.info("Root Mean Squared Error (RMSE) for Italy: {}", rmse);
-
-    Double d = 200.0;
-    double p = model.predict(Vectors.dense(d));
-    log.info("New cases for day #{}: {}", d, p);
-
-    d = 140.0;
-    p = model.predict(Vectors.dense(d));
-    log.info("New cases for day #{}: {}", d, p);
+    double rmse = evaluator.evaluate(predictionsDf);
+    log.debug("Root Mean Squared Error (RMSE): {}", rmse);
+    log.debug("Learned regression GBT model:\n{}", model.toDebugString());
 
     return model;
   }
 
+  public static Dataset<Row> buildGoalDataframe(SparkSession spark,
+      int maxDay) {
+    StructType schema = DataTypes.createStructType(new StructField[] {
+        DataTypes.createStructField(
+            "reportedDate",
+            DataTypes.DateType,
+            false),
+        DataTypes.createStructField(
+            "date",
+            DataTypes.DateType,
+            false),
+        DataTypes.createStructField(
+            "confirmed",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "deaths",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "recovered",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "active",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "day",
+            DataTypes.IntegerType,
+            false),
+        DataTypes.createStructField(
+            "new",
+            DataTypes.IntegerType,
+            false) });
+
+    List<Row> rows = new ArrayList<>();
+    for (int i = 0; i < 20; i++) {
+      rows.add(RowFactory.create(null, null, 0, 0, 0, 0, maxDay + i +365, 0));
+    }
+
+    return spark.createDataFrame(rows, schema);
+  }
+
   public static void predict(GBTRegressionModel model, double feature) {
     double p = model.predict(Vectors.dense(feature));
-    log.info("New cases for day #{}: {}", feature, p);// ((Double)
-                                                      // p).intValue());
+    log.info("New cases for day #{}: {}", feature, p);
   }
 
 }

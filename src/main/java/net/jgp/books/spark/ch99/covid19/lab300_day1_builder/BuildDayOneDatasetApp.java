@@ -39,9 +39,6 @@ public class BuildDayOneDatasetApp {
         .master("local[*]")
         .getOrCreate();
 
-    // Needed by Spark v3.0.0
-    // spark.sql("set spark.sql.legacy.timeParserPolicy=CORRECTED");
-
     // Phase 1
     // Ingest the data
     // (files) -> raw data
@@ -61,18 +58,14 @@ public class BuildDayOneDatasetApp {
     // pure data -> analytics
     Dataset<Row> italyDf = DataAnalytics.buildCountryAggregate(df, "Italy");
 
-    GBTRegressionModel model = DataAnalytics.buildModel(italyDf);
+    // build model
+    GBTRegressionModel model = DataAnalytics.buildModel(spark, italyDf);
 
-    Double d = 135.0;
-    double p = model.predict(Vectors.dense(d));
-    log.info("New cases for day #{}: {}", d, p);
-    d = 140.0;
-    p = model.predict(Vectors.dense(d));
-    log.info("New cases for day #{}: {}", d, p);
-
-    DataAnalytics.predict(model, 135.0);
-    DataAnalytics.predict(model, 140.0);
+    // Some prediction
     DataAnalytics.predict(model, 200.0);
+    DataAnalytics.predict(model, 300.0);
+    DataAnalytics.predict(model, 400.0);
+    DataAnalytics.predict(model, 500.0);
 
     // Dataset<Row> usaDf = DataAnalytics.buildCountryAggregate(df, "US");
     // usaDf = assembler.transform(usaDf);
