@@ -20,9 +20,13 @@ Located in the covid19 package.
 ### Data
 The data being ingested for those labs is coming from the Center for Systems Science and Engineering (CSSE), part of the Whiting School of Engineering of Johns Hopkins University (JHU). The data is share on GitHub at https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data.
 
+### Lab \#100 Ingestion
+
+Simple data ingestion, 
+
 ## Other stuff
 
-Located in the misc package.
+Located in the `misc` package.
 
 ### Lab #9xx
 Bunch of stuff in progress, please ignore.
