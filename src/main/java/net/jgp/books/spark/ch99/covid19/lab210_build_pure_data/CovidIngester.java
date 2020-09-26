@@ -1,4 +1,4 @@
-package net.jgp.books.spark.ch99.covid19.lab300_day1_builder;
+package net.jgp.books.spark.ch99.covid19.lab210_build_pure_data;
 
 import static org.apache.spark.sql.functions.*;
 

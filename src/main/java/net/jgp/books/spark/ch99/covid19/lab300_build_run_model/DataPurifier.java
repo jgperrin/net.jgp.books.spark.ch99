@@ -1,4 +1,4 @@
-package net.jgp.books.spark.ch99.covid19.lab300_day1_builder;
+package net.jgp.books.spark.ch99.covid19.lab300_build_run_model;
 
 import static org.apache.spark.sql.functions.concat_ws;
 import static org.apache.spark.sql.functions.lit;

@@ -1,4 +1,4 @@
-package net.jgp.books.spark.ch99.covid19.lab300_day1_builder;
+package net.jgp.books.spark.ch99.covid19.lab300_build_run_model;
 
 import org.apache.spark.ml.linalg.Vectors;
 import org.apache.spark.ml.regression.GBTRegressionModel;
@@ -15,12 +15,12 @@ import org.slf4j.LoggerFactory;
  * @author jgp
  *
  */
-public class BuildDayOneDatasetApp {
+public class BuildRunModelApp {
   private static Logger log =
-      LoggerFactory.getLogger(BuildDayOneDatasetApp.class);
+      LoggerFactory.getLogger(BuildRunModelApp.class);
 
   public static void main(String[] args) {
-    BuildDayOneDatasetApp app = new BuildDayOneDatasetApp();
+    BuildRunModelApp app = new BuildRunModelApp();
     app.start();
   }
 
