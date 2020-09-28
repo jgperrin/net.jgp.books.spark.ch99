@@ -1,6 +1,7 @@
 package net.jgp.books.spark.ch99.covid19.lab210_build_pure_data;
 
-import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.lit;
+import static org.apache.spark.sql.functions.to_date;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -11,7 +12,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;

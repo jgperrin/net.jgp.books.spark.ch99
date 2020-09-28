@@ -15,12 +15,12 @@ import net.jgp.books.spark.ch99.x.utils.DataframeUtils;
  * @author jgp
  *
  */
-public class BuildDayOneDatasetApp {
+public class BuildPureDataApp {
   private static Logger log =
-      LoggerFactory.getLogger(BuildDayOneDatasetApp.class);
+      LoggerFactory.getLogger(BuildPureDataApp.class);
 
   public static void main(String[] args) {
-    BuildDayOneDatasetApp app = new BuildDayOneDatasetApp();
+    BuildPureDataApp app = new BuildPureDataApp();
     app.start();
   }
 
@@ -34,7 +34,7 @@ public class BuildDayOneDatasetApp {
 
     log.debug("##### Create Spark session");
     spark = SparkSession.builder()
-        .appName("Build ")
+        .appName("Build pure data")
         .config("spark.sql.legacy.timeParserPolicy", "CORRECTED")
         .master("local[*]")
         .getOrCreate();
