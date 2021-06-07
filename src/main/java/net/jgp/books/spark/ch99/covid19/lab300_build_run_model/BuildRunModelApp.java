@@ -1,6 +1,5 @@
 package net.jgp.books.spark.ch99.covid19.lab300_build_run_model;
 
-import org.apache.spark.ml.linalg.Vectors;
 import org.apache.spark.ml.regression.GBTRegressionModel;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
