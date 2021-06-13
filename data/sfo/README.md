@@ -1,9 +1,9 @@
-The examples in this repository are support to the **[Spark in Action, 2nd edition](http://jgp.net/sia)** book by Jean Georges Perrin and published by Manning. Find out more about the book on [Manning's website](http://jgp.net/sia).
+The examples in this repository are support to the **[Spark in Action, 2nd edition](http://jgp.net/sia)** book by Jean-Georges Perrin and published by Manning. Find out more about the book on [Manning's website](http://jgp.net/sia).
 
 # SF Air Traffic Passenger and Landings Statistics
 
 
-Welcome to Spark with Java, chapter 12. This chapter is about **data transformation**.
+Welcome to Spark in Action, 2e, chapter 12. This chapter is about **data transformation**.
 
 Dataset can be downloaded from [Kaggle](https://www.kaggle.com/san-francisco/sf-air-traffic-passenger-and-landings-statistics#DataSF%20Data%20Dictionary%20for%20Air%20Traffic%20LANDINGS%20Statistics.pdf)
 
