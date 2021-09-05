@@ -27,3 +27,6 @@ hs_err_pid*
 /bin/
 /data/covid19-jhu
 /.DS_Store
+src/.DS_Store
+src/main/.DS_Store
+src/main/js/.DS_Store

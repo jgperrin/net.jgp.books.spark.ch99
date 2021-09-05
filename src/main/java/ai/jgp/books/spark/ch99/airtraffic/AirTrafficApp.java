@@ -1,13 +1,15 @@
 package ai.jgp.books.spark.ch99.airtraffic;
 
+import static org.apache.spark.sql.functions.expr;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ai.jgp.books.spark.ch99.covid19.x.utils.GitUtils;
-import ai.jgp.books.spark.ch99.x.utils.DataframeUtils;
 
 /**
  * Cleans a dataset and then extrapolates date through machine learning, via
@@ -30,31 +32,72 @@ public class AirTrafficApp {
    */
   private boolean start() {
     log.debug("-> start()");
+    long t0 = System.currentTimeMillis();
 
-    // Clone
-    GitUtils.syncRepository(
-        "https://github.com/CSSEGISandData/COVID-19.git",
-        "./data/covid19-jhu");
-
-    log.debug("##### Create Spark session");
+    // Creates a session on a local master
     SparkSession spark = SparkSession.builder()
-        .appName("Ingestion of Covid-19 data")
+        .appName("CSV to Dataset")
         .master("local[*]")
         .getOrCreate();
 
-    log.debug("##### Ingestion");
-    String filenames =
-        "data/covid19-jhu/csse_covid_19_data/csse_covid_19_daily_reports/*.csv";
-    Dataset<Row> df = spark
-        .read()
-        .format("csv")
-        .option("inferSchema", true)
-        .option("header", true)
-        .load(filenames);
+    long tc = System.currentTimeMillis();
+    log.info("Spark master available in {} ms.", (tc - t0));
+    t0 = tc;
 
-    // Stat
-    log.debug("##### Stat");
-    DataframeUtils.show(df);
+    // Creates the schema
+    StructType schema = DataTypes.createStructType(new StructField[] {
+        DataTypes.createStructField(
+            "month",
+            DataTypes.DateType,
+            false),
+        DataTypes.createStructField(
+            "pax",
+            DataTypes.IntegerType,
+            true) });
+
+    // Reads a CSV file with header
+    Dataset<Row> internationalPaxDf = spark.read().format("csv")
+        .option("header", true)
+        .option("dateFormat", "MMMM yyyy")
+        .schema(schema)
+        .load(
+            "data/bts/International USCarrier_Traffic_20210902163435.csv");
+    internationalPaxDf =
+        internationalPaxDf.withColumnRenamed("pax", "internationalPax");
+
+    tc = System.currentTimeMillis();
+    log.info("International pax ingested in {} ms.", (tc - t0));
+    t0 = tc;
+
+    // Domestic
+    Dataset<Row> domesticPaxDf = spark.read().format("csv")
+        .option("header", true)
+        .option("dateFormat", "MMMM yyyy")
+        .schema(schema)
+        .load(
+            "data/bts/Domestic USCarrier_Traffic_20210902163435.csv");
+    domesticPaxDf = domesticPaxDf.withColumnRenamed("pax", "domesticPax");
+    tc = System.currentTimeMillis();
+    log.info("Domestic pax ingested in {} ms.", (tc - t0));
+    t0 = tc;
+
+    Dataset<Row> df = internationalPaxDf
+        .join(domesticPaxDf,
+            internationalPaxDf.col("month")
+                .equalTo(domesticPaxDf.col("month")),
+            "outer")
+        .withColumn("pax", expr("internationalPax + domesticPax"))
+        .drop(domesticPaxDf.col("month"));
+    
+    tc = System.currentTimeMillis();
+    log.info("Transformation to gold zone in {} ms.", (tc - t0));
+    t0 = tc;
+
+    // Shows at most 5 rows from the dataframe
+    df.show(5, false);
+    df.printSchema();
+
+    spark.stop();
     return true;
   }
 
